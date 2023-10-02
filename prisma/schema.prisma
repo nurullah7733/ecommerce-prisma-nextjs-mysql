@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  name      String   @db.VarChar(100)
+  email     String   @unique
+  password  String   @db.VarChar(300)
+  role      Role     @default(USER)
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  updatedAt DateTime @default(now()) @db.Timestamp(0)
+
+  profile Profile[]
+}
+
+model Profile {
+  id               BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  userAdd          String   @db.VarChar(200)
+  userState        String?  @db.VarChar(200)
+  userCity         String   @db.VarChar(200)
+  userPostcode     String?  @db.VarChar(200)
+  userCountry      String?  @db.VarChar(200)
+  userPhone        String   @db.VarChar(200)
+  shippingAdd      String   @db.VarChar(200)
+  shippingState    String?  @db.VarChar(200)
+  shippingCity     String   @db.VarChar(200)
+  shippingPostcode String?  @db.VarChar(200)
+  shippingCountry  String?  @db.VarChar(200)
+  shippingPhone    String   @db.VarChar(200)
+  createdAt        DateTime @default(now()) @db.Timestamp(0)
+  updatedAt        DateTime @default(now()) @db.Timestamp(0)
+  userId           BigInt   @db.UnsignedBigInt
+  user             User     @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+}
+
+model Brands {
+  id        BigInt     @id @default(autoincrement())
+  brandName String     @db.VarChar(100)
+  brandImg  String     @db.VarChar(300)
+  createdAt DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt DateTime   @default(now()) @db.Timestamp(0)
+  Products  Products[]
+}
+
+model Categories {
+  id           BigInt   @id @default(autoincrement())
+  categoryName String   @db.VarChar(100)
+  categoryImg  String   @db.VarChar(300)
+  createdAt    DateTime @default(now()) @db.Timestamp(0)
+  updatedAt    DateTime @default(now()) @db.Timestamp(0)
+
+  Products Products[]
+}
+
+model Products {
+  id            BigInt   @id @default(autoincrement())
+  title         String   @db.VarChar(100)
+  shortDes      String   @db.VarChar(300)
+  price         String   @db.VarChar(50)
+  discount      String   @db.VarChar(50)
+  discountPrice String   @db.VarChar(50)
+  img           String   @db.VarChar(50)
+  stock         Boolean  @db.TinyInt
+  star          Float    @db.Double
+  remark        Remark   @default(regular)
+  brandId       BigInt   @db.UnsignedBigInt
+  categoryId    BigInt   @db.UnsignedBigInt
+  createdAt     DateTime @default(now()) @db.Timestamp(0)
+  updatedAt     DateTime @default(now()) @db.Timestamp(0)
+
+  brands     Brands     @relation(fields: [brandId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  categories Categories @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Remark {
+  popular
+  new
+  top
+  special
+  trending
+  regular
+}
